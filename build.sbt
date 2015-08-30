@@ -13,3 +13,5 @@ libraryDependencies ++= Seq(
 
 initialCommands := "import com.jandritsch.productsearch._"
 
+mainClass := Some("com.jandritsch.productsearch.Program")
+
