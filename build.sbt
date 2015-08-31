@@ -11,6 +11,8 @@ libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.1" % "test" withSources() withJavadoc()
 )
 
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
+
 initialCommands := "import com.jandritsch.productsearch._"
 
 mainClass := Some("com.jandritsch.productsearch.Program")

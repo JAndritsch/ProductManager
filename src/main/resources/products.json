@@ -1,7 +1,1 @@
-{
-  "products" : [
-    {"name": "Widget", "price": 25.00, "quantity": 5 },
-    {"name": "Thing", "price": 15.00, "quantity": 5 },
-    {"name": "Dodad", "price": 5.00, "quantity": 10 }
-  ]
-}
+{"products":[{"name":"Widget","price":25.0,"quantity":5},{"name":"Thing","price":15.0,"quantity":5},{"name":"Dodad","price":5.0,"quantity":10},{"name":"Derp","price":19.99,"quantity":4}]}
