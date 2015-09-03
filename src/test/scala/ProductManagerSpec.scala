@@ -6,6 +6,7 @@ import java.io.{File, BufferedWriter, FileWriter}
 class ProductManagerSpec extends FunSpec with BeforeAndAfter {
 
   val productsFilePath = "src/test/resources/products.json"
+  var productManager:ProductManager = _
 
   before {
     // Set up sample products file
@@ -22,11 +23,11 @@ class ProductManagerSpec extends FunSpec with BeforeAndAfter {
       """
       )
     bw.close()
+    productManager = new ProductManager(productsFilePath)
   }
 
   describe("#findProductByName") {
     it("accepts a product name and returns a Some containing the found product") {
-      val productManager = new ProductManager(productsFilePath)
       var savedProducts = FileUtils.readFileAsJson(productsFilePath)
       val entries = (savedProducts \ "products").children
       val product2 = entries(1)
@@ -34,15 +35,12 @@ class ProductManagerSpec extends FunSpec with BeforeAndAfter {
     }
 
     it("returns None if the product was not found") {
-      val productManager = new ProductManager(productsFilePath)
       assert(productManager.findProductByName("does not exist") === None)
     }
   }
 
   describe("#addProduct") {
     it("accepts a name, price, and quantity and writes it to the products file") {
-      val productManager = new ProductManager(productsFilePath)
-
       productManager.addProduct("product3", 5.99, 7)
       var savedProducts = FileUtils.readFileAsJson(productsFilePath)
       val entries = (savedProducts \ "products").children
