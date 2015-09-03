@@ -1,35 +1,35 @@
 package com.jandritsch.productsearch
 
 import org.scalatest._
+import org.json4s._
+import org.json4s.native.JsonMethods._
 import java.io.{File, BufferedWriter, FileWriter}
 
 class ProductManagerSpec extends FunSpec with BeforeAndAfter {
 
-  val productsFilePath = "src/test/resources/products.json"
+  val dataStore = new InMemoryDataStore()
   var productManager:ProductManager = _
 
   before {
-    // Set up sample products file
-    val file = new File(productsFilePath)
-    val bw = new BufferedWriter(new FileWriter(file))
-    bw.write(
-      """
-      { 
-        "products": [
-          { "name": "product1", "price": 3.99, "quantity": 2 },
-          { "name": "product2", "price": 1.99, "quantity": 5 }
-        ]
-      }
-      """
+    dataStore.writeObject(
+      parse(
+        """
+        { 
+          "products": [
+            { "name": "product1", "price": 3.99, "quantity": 2 },
+            { "name": "product2", "price": 1.99, "quantity": 5 }
+          ]
+        }
+        """
       )
-    bw.close()
-    productManager = new ProductManager(productsFilePath)
+    )
+    productManager = new ProductManager(dataStore)
   }
 
   describe("#findProductByName") {
     it("accepts a product name and returns a Some containing the found product") {
       // setup
-      var savedProducts = FileUtils.readFileAsJson(productsFilePath)
+      var savedProducts = dataStore.read
       val entries = (savedProducts \ "products").children
       val product2 = entries(1)
 
@@ -42,7 +42,7 @@ class ProductManagerSpec extends FunSpec with BeforeAndAfter {
 
     it("is case-insensitive") {
       // setup
-      var savedProducts = FileUtils.readFileAsJson(productsFilePath)
+      var savedProducts = dataStore.read
       val entries = (savedProducts \ "products").children
       val product2 = entries(1)
 
@@ -72,7 +72,7 @@ class ProductManagerSpec extends FunSpec with BeforeAndAfter {
       productManager.addProduct("product3", 5.99, 7)
 
       // assert
-      var savedProducts = FileUtils.readFileAsJson(productsFilePath)
+      var savedProducts = dataStore.read
       val entries = (savedProducts \ "products").children
       val entry1 = entries(0)
       val entry2 = entries(1)
@@ -97,8 +97,8 @@ class ProductManagerSpec extends FunSpec with BeforeAndAfter {
   describe("#getProductInfo") {
     it("accepts a product and returns a tuple containing its name, price, and quantity") {
       // setup
-      val productManager = new ProductManager(productsFilePath)
-      var savedProducts = FileUtils.readFileAsJson(productsFilePath)
+      val productManager = new ProductManager(dataStore)
+      var savedProducts = dataStore.read
       val entries = (savedProducts \ "products").children
       val product2 = entries(1)
 

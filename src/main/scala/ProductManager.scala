@@ -3,9 +3,9 @@ package com.jandritsch.productsearch
 import org.json4s._
 import org.json4s.native.JsonMethods._
 
-class ProductManager(val productsFilePath:String) {
+class ProductManager(val dataStore:DataStore) {
 
-  var products = FileUtils.readFileAsJson(productsFilePath)
+  var products = dataStore.read
 
   def findProductByName(name:String):Option[JValue] = {
     (products \ "products").children.find((p) => 
@@ -18,7 +18,7 @@ class ProductManager(val productsFilePath:String) {
     products = products.merge(
       JObject(List(JField("products", JArray(List(product)))))
     )
-    FileUtils.writeToFile(productsFilePath, products)
+    dataStore.writeObject(products)
   }
 
   def getProductInfo(product:JValue):(String,String,String) = {

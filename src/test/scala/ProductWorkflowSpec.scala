@@ -1,32 +1,14 @@
 package com.jandritsch.productsearch
 
 import org.scalatest._
-import scala.collection.mutable.MutableList
+import org.json4s._
+import org.json4s.native.JsonMethods._
 import java.io.{File, BufferedWriter, FileWriter}
-
-class MockUserInput extends UserInput {
-  var shouldAddProduct:String = ""
-  var newProductPrice:String = ""
-  var newProductQuantity:String = ""
-
-  def getShouldAddProduct:String = shouldAddProduct
-  def getNewProductPrice:String = newProductPrice
-  def getNewProductQuantity:String = newProductQuantity
-}
-
-class MockUserOutput extends UserOutput {
-  var entries:MutableList[String] = new MutableList()
-
-  def display(text:String, newLine:Boolean) = {
-    entries += text
-  }
-}
 
 class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
 
-  val productsFilePath = "src/test/resources/products-workflow.json"
-  val historyFilePath = "src/test/resources/history-workflow.json"
-
+  val productDataStore = new InMemoryDataStore()
+  val historyDataStore = new InMemoryDataStore()
   var productManager:ProductManager = _
   var historyManager:HistoryManager = _
   var userInput:MockUserInput = _
@@ -34,35 +16,31 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
   var productWorkflow:ProductWorkflow = _
 
   before {
-    // Set up sample products file
-    var file = new File(productsFilePath)
-    var bw = new BufferedWriter(new FileWriter(file))
-    bw.write(
-      """
-      { 
-        "products": [
-          { "name": "product1", "price": 3.99, "quantity": 2 },
-          { "name": "product2", "price": 1.99, "quantity": 5 }
-        ]
-      }
-      """
+    productDataStore.writeObject(
+      parse(
+        """
+        { 
+          "products": [
+            { "name": "product1", "price": 3.99, "quantity": 2 },
+            { "name": "product2", "price": 1.99, "quantity": 5 }
+          ]
+        }
+        """
       )
-    bw.close()
-    productManager = new ProductManager(productsFilePath)
+    )
+    productManager = new ProductManager(productDataStore)
 
-    // Set up sample history file
-    file = new File(historyFilePath)
-    bw = new BufferedWriter(new FileWriter(file))
-    bw.write(
-      """
-      { 
-        "history": [
-        ]
-      }
-      """
+    historyDataStore.writeObject(
+      parse(
+        """
+        { 
+          "history": [
+          ]
+        }
+        """
       )
-    bw.close()
-    historyManager = new HistoryManager(historyFilePath)
+    )
+    historyManager = new HistoryManager(historyDataStore)
 
     userInput = new MockUserInput()
     userOutput = new MockUserOutput()
@@ -86,7 +64,7 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
         productWorkflow.run(enteredProducts)
 
         // assert
-        val savedHistory = FileUtils.readFileAsJson(historyFilePath)
+        val savedHistory = historyDataStore.read
         val entries = (savedHistory \ "history").children
         val entry1 = entries(0)
 
@@ -120,7 +98,7 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
         productWorkflow.run(enteredProducts)
 
         // assert
-        val savedHistory = FileUtils.readFileAsJson(historyFilePath)
+        val savedHistory = historyDataStore.read
         val entries = (savedHistory \ "history").children
         val entry1 = entries(0)
 

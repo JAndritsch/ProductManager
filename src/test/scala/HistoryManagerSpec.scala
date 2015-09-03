@@ -1,35 +1,29 @@
 package com.jandritsch.productsearch
 
 import org.scalatest._
+import org.json4s._
+import org.json4s.native.JsonMethods._
 import java.io.{File, BufferedWriter, FileWriter}
 
 class HistoryManagerSpec extends FunSpec with BeforeAndAfter {
 
-  val historyFilePath = "src/test/resources/history.json"
+  val dataStore = new InMemoryDataStore()
 
   before {
-    // Set up sample history file
-    val file = new File(historyFilePath)
-    val bw = new BufferedWriter(new FileWriter(file))
-    bw.write(
-      """
-      { "history": [] }
-      """
-      )
-    bw.close()
+    dataStore.writeObject(parse("""{ "history": [] }"""))
   }
 
   describe("#addHistory") {
     it("accepts a search term and whether or not it was found and writes it to history") {
       // setup
-      val historyManager = new HistoryManager(historyFilePath)
+      val historyManager = new HistoryManager(dataStore)
 
       // act
       historyManager.addHistory("product1", false)
       historyManager.addHistory("product2", true)
 
       // assert
-      var savedHistory = FileUtils.readFileAsJson(historyFilePath)
+      var savedHistory = dataStore.read
       val entries = (savedHistory \ "history").children
       val entry1 = entries(0)
       val entry2 = entries(1)

@@ -5,16 +5,16 @@ import org.json4s.native.JsonMethods._
 import java.util.Date
 import java.text.SimpleDateFormat
 
-class HistoryManager(val historyFilePath:String) {
+class HistoryManager(val dataStore:DataStore) {
 
-  var history = FileUtils.readFileAsJson(historyFilePath)
+  var history = dataStore.read
 
   def addHistory(term:String, found:Boolean) = {
     val entry = makeHistory(term, found)
     history = history.merge(
       JObject(List(JField("history", JArray(List(entry)))))
     )
-    FileUtils.writeToFile(historyFilePath, history)
+    dataStore.writeObject(history)
   }
 
   private def makeHistory(term:String, found:Boolean):JObject = {
