@@ -5,9 +5,8 @@ import org.json4s.native.JsonMethods._
 import java.util.Date
 import java.text.SimpleDateFormat
 
-class HistoryManager {
+class HistoryManager(val historyFilePath:String) {
 
-  val historyFilePath = "src/main/resources/history.json"
   var history = FileUtils.readFileAsJson(historyFilePath)
 
   def addHistory(term:String, found:Boolean) = {

@@ -3,9 +3,8 @@ package com.jandritsch.productsearch
 import org.json4s._
 import org.json4s.native.JsonMethods._
 
-class ProductManager {
+class ProductManager(val productsFilePath:String) {
 
-  val productsFilePath = "src/main/resources/products.json"
   var products = FileUtils.readFileAsJson(productsFilePath)
 
   def findProductByName(name:String):Option[JValue] = {
