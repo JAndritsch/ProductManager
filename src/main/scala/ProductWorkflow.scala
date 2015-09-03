@@ -16,7 +16,7 @@ class ProductWorkflow(
         userOutput.display("That product was not found. Would you like to add it: ", false)
         val input = userInput.getShouldAddProduct.toLowerCase
         val addIt = (input == "yes" || input == "y")
-        productWasNotfound(name, addIt)
+        productWasNotFound(name, addIt)
       } else {
         productWasFound(name, product.get)
       }
@@ -24,7 +24,7 @@ class ProductWorkflow(
     }
   }
 
-  private def productWasNotfound(name:String, shouldAdd:Boolean) = {
+  private def productWasNotFound(name:String, shouldAdd:Boolean) = {
     historyManager.addHistory(name, false)
     if (shouldAdd) {
       userOutput.display("Enter the price for '" + name + "': ", false)
