@@ -1,0 +1,6 @@
+{
+  "products":[
+    {"name":"Widget","price":25.0,"quantity":5},
+    {"name":"Dodad","price":5.0,"quantity":10}
+  ]
+}

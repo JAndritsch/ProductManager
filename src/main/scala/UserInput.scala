@@ -1,6 +1,6 @@
 package com.jandritsch.productsearch
 
-class UserInput {
-  def getUserInput:String = readLine
+trait UserInput {
+  def getUserInput:String
 }
 
