@@ -45,7 +45,7 @@ class ProductWorkflow(
     val (name, price, qty) = productInfo
     userOutput.display("Name: " + name, true)
     userOutput.display("Price: $" + price, true)
-    userOutput.display("Quantity on hand:" + qty, true)
+    userOutput.display("Quantity on hand: " + qty, true)
   }
 
 }

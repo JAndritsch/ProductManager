@@ -28,34 +28,57 @@ class ProductManagerSpec extends FunSpec with BeforeAndAfter {
 
   describe("#findProductByName") {
     it("accepts a product name and returns a Some containing the found product") {
+      // setup
       var savedProducts = FileUtils.readFileAsJson(productsFilePath)
       val entries = (savedProducts \ "products").children
       val product2 = entries(1)
-      assert(productManager.findProductByName("product2") === Some(product2))
+
+      // act
+      val result = productManager.findProductByName("product2")
+
+      // assert
+      assert(result === Some(product2))
     }
 
     it("is case-insensitive") {
+      // setup
       var savedProducts = FileUtils.readFileAsJson(productsFilePath)
       val entries = (savedProducts \ "products").children
       val product2 = entries(1)
-      assert(productManager.findProductByName("PrOdUcT2") === Some(product2))
+
+      // act
+      val result = productManager.findProductByName("PrOdUcT2")
+
+      // assert
+      assert(result === Some(product2))
     }
 
     it("returns None if the product was not found") {
-      assert(productManager.findProductByName("does not exist") === None)
+      // setup
+
+      // act
+      val result = productManager.findProductByName("does not exist")
+
+      // assert
+      assert(result === None)
     }
   }
 
   describe("#addProduct") {
     it("accepts a name, price, and quantity and writes it to the products file") {
+      // setup
+
+      // act
       productManager.addProduct("product3", 5.99, 7)
+
+      // assert
       var savedProducts = FileUtils.readFileAsJson(productsFilePath)
       val entries = (savedProducts \ "products").children
-      assert(entries.length === 3)
-
       val entry1 = entries(0)
       val entry2 = entries(1)
       val entry3 = entries(2)
+
+      assert(entries.length === 3)
 
       assert((entry1 \ "name").values === "product1")
       assert((entry1 \ "price").values === 3.99)
@@ -73,12 +96,16 @@ class ProductManagerSpec extends FunSpec with BeforeAndAfter {
 
   describe("#getProductInfo") {
     it("accepts a product and returns a tuple containing its name, price, and quantity") {
+      // setup
       val productManager = new ProductManager(productsFilePath)
       var savedProducts = FileUtils.readFileAsJson(productsFilePath)
       val entries = (savedProducts \ "products").children
       val product2 = entries(1)
 
+      // act
       val (name, price, quantity) = productManager.getProductInfo(product2)
+
+      // assert
       assert(name === "product2")
       assert(price === "1.99")
       assert(quantity === "5")

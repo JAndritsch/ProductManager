@@ -1,8 +1,8 @@
 package com.jandritsch.productsearch
 
 import org.scalatest._
+import scala.collection.mutable.MutableList
 import java.io.{File, BufferedWriter, FileWriter}
-import java.util.ArrayList
 
 class MockUserInput extends UserInput {
   var shouldAddProduct:String = ""
@@ -15,17 +15,17 @@ class MockUserInput extends UserInput {
 }
 
 class MockUserOutput extends UserOutput {
-  var displayed:ArrayList[String] = new ArrayList()
+  var entries:MutableList[String] = new MutableList()
 
   def display(text:String, newLine:Boolean) = {
-    displayed.add(text)
+    entries += text
   }
 }
 
 class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
 
-  val productsFilePath = "src/test/resources/products.json"
-  val historyFilePath = "src/test/resources/history.json"
+  val productsFilePath = "src/test/resources/products-workflow.json"
+  val historyFilePath = "src/test/resources/history-workflow.json"
 
   var productManager:ProductManager = _
   var historyManager:HistoryManager = _
@@ -77,9 +77,131 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
   }
 
   describe("#run") {
-
     describe("when the product was found") {
-      it(""){
+      it("adds an entry to the history showing that the product was found"){
+        // setup
+        val enteredProducts = Iterator("product1")
+
+        // act
+        productWorkflow.run(enteredProducts)
+
+        // assert
+        val savedHistory = FileUtils.readFileAsJson(historyFilePath)
+        val savedProducts = FileUtils.readFileAsJson(productsFilePath)
+        val entries = (savedHistory \ "history").children
+        val entry1 = entries(0)
+
+        assert(entries.length === 1)
+        assert((entry1 \ "name").values === "product1")
+        assert((entry1 \ "found").values === true)
+      }
+
+      it("outputs the information of the product that was found") {
+        // setup
+        val enteredProducts = Iterator("product1")
+
+        // act
+        productWorkflow.run(enteredProducts)
+
+        // assert
+        assert(userOutput.entries.contains("Name: product1"))
+        assert(userOutput.entries.contains("Price: $3.99"))
+        assert(userOutput.entries.contains("Quantity on hand: 2"))
+      }
+    }
+
+    describe("when the product was not found") {
+
+      it("adds an entry to the history showing that the product was not found") {
+        // setup
+        val enteredProducts = Iterator("product3")
+        userInput.shouldAddProduct = "No"
+
+        // act
+        productWorkflow.run(enteredProducts)
+
+        // assert
+        val savedHistory = FileUtils.readFileAsJson(historyFilePath)
+        val savedProducts = FileUtils.readFileAsJson(productsFilePath)
+        val entries = (savedHistory \ "history").children
+        val entry1 = entries(0)
+
+        assert(entries.length === 1)
+        assert((entry1 \ "name").values === "product3")
+        assert((entry1 \ "found").values === false)
+      }
+
+      describe("and the user does not want to add the product") {
+        it("does not ask the user to enter in any data for the product") {
+          // setup
+          val enteredProducts = Iterator("product3")
+          userInput.shouldAddProduct = "No"
+
+          // act
+          productWorkflow.run(enteredProducts)
+
+          // assert
+          assert(!userOutput.entries.contains("Enter the price for 'product3': "))
+          assert(!userOutput.entries.contains("Enter the quantity for 'product3': "))
+          assert(!userOutput.entries.contains("Your product has been added!"))
+        }
+
+        it("does not add the product") {
+          // setup
+          val enteredProducts = Iterator("product3")
+          userInput.shouldAddProduct = "No"
+
+          // act
+          productWorkflow.run(enteredProducts)
+
+          // assert
+          assert(productManager.findProductByName("product3") === None)
+        }
+      }
+
+      describe("and the user wants to add the product") {
+        it("asks the user to enter the new product information") {
+          // setup
+          val enteredProducts = Iterator("product3")
+          userInput.shouldAddProduct = "Yes"
+          userInput.newProductPrice = "14.99"
+          userInput.newProductQuantity = "27"
+
+          // act
+          productWorkflow.run(enteredProducts)
+
+          // assert
+          assert(userOutput.entries.contains("Enter the price for 'product3': "))
+          assert(userOutput.entries.contains("Enter the quantity for 'product3': "))
+        }
+
+        it("adds the product to the list") {
+          // setup
+          val enteredProducts = Iterator("product3")
+          userInput.shouldAddProduct = "Yes"
+          userInput.newProductPrice = "14.99"
+          userInput.newProductQuantity = "27"
+
+          // act
+          productWorkflow.run(enteredProducts)
+
+          // assert
+          assert(productManager.findProductByName("product3") !== None)
+        }
+
+        it("notifies the user that the product has been added") {
+          // setup
+          val enteredProducts = Iterator("product3")
+          userInput.shouldAddProduct = "Yes"
+          userInput.newProductPrice = "14.99"
+          userInput.newProductQuantity = "27"
+
+          // act
+          productWorkflow.run(enteredProducts)
+
+          // assert
+          assert(userOutput.entries.contains("Your product has been added!"))
+        }
       }
     }
 
