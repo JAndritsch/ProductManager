@@ -14,7 +14,7 @@ class ProductWorkflow(
       val product = productManager.findProductByName(name)
       if (product == None) {
         promptUser("That product was not found. Would you like to add it: ", false)
-        val input = userInput.getUserInput.toLowerCase
+        val input = userInput.getShouldAddProduct.toLowerCase
         val addIt = (input == "yes" || input == "y")
         productWasNotfound(name, addIt)
       } else {
@@ -28,9 +28,9 @@ class ProductWorkflow(
     historyManager.addHistory(name, false)
     if (shouldAdd) {
       promptUser("Enter the price for '" + name + "': ", false)
-      val price:Double = userInput.getUserInput.toDouble
+      val price:Double = userInput.getNewProductPrice.toDouble
       promptUser("Enter the quantity for '" + name + "': ", false)
-      val quantity:Int = userInput.getUserInput.toInt
+      val quantity:Int = userInput.getNewProductQuantity.toInt
       productManager.addProduct(name, price, quantity)
       promptUser("Your product has been added!", true)
     }
