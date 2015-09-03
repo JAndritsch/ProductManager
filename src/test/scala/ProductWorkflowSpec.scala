@@ -87,7 +87,6 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
 
         // assert
         val savedHistory = FileUtils.readFileAsJson(historyFilePath)
-        val savedProducts = FileUtils.readFileAsJson(productsFilePath)
         val entries = (savedHistory \ "history").children
         val entry1 = entries(0)
 
@@ -122,7 +121,6 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
 
         // assert
         val savedHistory = FileUtils.readFileAsJson(historyFilePath)
-        val savedProducts = FileUtils.readFileAsJson(productsFilePath)
         val entries = (savedHistory \ "history").children
         val entry1 = entries(0)
 
