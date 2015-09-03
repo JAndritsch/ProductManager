@@ -34,6 +34,13 @@ class ProductManagerSpec extends FunSpec with BeforeAndAfter {
       assert(productManager.findProductByName("product2") === Some(product2))
     }
 
+    it("is case-insensitive") {
+      var savedProducts = FileUtils.readFileAsJson(productsFilePath)
+      val entries = (savedProducts \ "products").children
+      val product2 = entries(1)
+      assert(productManager.findProductByName("PrOdUcT2") === Some(product2))
+    }
+
     it("returns None if the product was not found") {
       assert(productManager.findProductByName("does not exist") === None)
     }
