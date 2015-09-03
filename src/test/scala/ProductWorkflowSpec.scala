@@ -198,7 +198,10 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
           productWorkflow.run(enteredProducts)
 
           // assert
-          assert(productManager.findProductByName("product3") !== None)
+          val product = productManager.findProductByName("product3")
+          val (name, price, quantity) = productManager.getProductInfo(product.get)
+          assert(price === "14.99")
+          assert(quantity === "27")
         }
 
         it("notifies the user that the product has been added") {
