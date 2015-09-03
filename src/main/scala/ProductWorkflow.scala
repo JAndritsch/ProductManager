@@ -6,56 +6,46 @@ class ProductWorkflow(
   val productManager:ProductManager,
   val historyManager:HistoryManager,
   val userInput:UserInput,
-  val usePrompt:Boolean
+  val userOutput:UserOutput
 ) {
 
   def run(productNames:Iterator[String]) {
     for (name <- productNames) {
       val product = productManager.findProductByName(name)
       if (product == None) {
-        promptUser("That product was not found. Would you like to add it: ", false)
+        userOutput.display("That product was not found. Would you like to add it: ", false)
         val input = userInput.getShouldAddProduct.toLowerCase
         val addIt = (input == "yes" || input == "y")
         productWasNotfound(name, addIt)
       } else {
         productWasFound(name, product.get)
       }
-      promptUser("Enter the product name: ", false)
+      userOutput.display("Enter the product name: ", false)
     }
   }
 
-  def productWasNotfound(name:String, shouldAdd:Boolean) = {
+  private def productWasNotfound(name:String, shouldAdd:Boolean) = {
     historyManager.addHistory(name, false)
     if (shouldAdd) {
-      promptUser("Enter the price for '" + name + "': ", false)
+      userOutput.display("Enter the price for '" + name + "': ", false)
       val price:Double = userInput.getNewProductPrice.toDouble
-      promptUser("Enter the quantity for '" + name + "': ", false)
+      userOutput.display("Enter the quantity for '" + name + "': ", false)
       val quantity:Int = userInput.getNewProductQuantity.toInt
       productManager.addProduct(name, price, quantity)
-      promptUser("Your product has been added!", true)
+      userOutput.display("Your product has been added!", true)
     }
   }
 
-  def productWasFound(name:String, product:JValue) {
+  private def productWasFound(name:String, product:JValue) {
     historyManager.addHistory(name, true)
     displayProductInfo(productManager.getProductInfo(product))
   }
 
-  def displayProductInfo(productInfo:(String,String,String)) = {
+  private def displayProductInfo(productInfo:(String,String,String)) = {
     val (name, price, qty) = productInfo
-    promptUser("Name: " + name, true)
-    promptUser("Price: $" + price, true)
-    promptUser("Quantity on hand:" + qty, true)
-  }
-
-  private def promptUser(text:String, newLine:Boolean) = {
-    if (usePrompt) {
-      if (newLine) {
-        println(text)
-      } else {
-        print(text)
-      }
-    }
+    userOutput.display("Name: " + name, true)
+    userOutput.display("Price: $" + price, true)
+    userOutput.display("Quantity on hand:" + qty, true)
   }
 
 }

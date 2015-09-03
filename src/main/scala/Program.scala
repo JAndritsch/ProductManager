@@ -7,11 +7,12 @@ object Program {
     val productManager = new ProductManager("src/main/resources/products.json")
     val historyManager = new HistoryManager("src/main/resources/history.json")
     val userInput = new DefaultUserInput()
+    val userOutput = new DefaultUserOutput()
     val productWorkflow = new ProductWorkflow(
       productManager,
       historyManager,
       userInput,
-      true
+      userOutput
     )
 
     print("Enter the product name: ")

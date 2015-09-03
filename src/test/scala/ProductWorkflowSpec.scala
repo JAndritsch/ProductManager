@@ -2,6 +2,7 @@ package com.jandritsch.productsearch
 
 import org.scalatest._
 import java.io.{File, BufferedWriter, FileWriter}
+import java.util.ArrayList
 
 class MockUserInput extends UserInput {
   var shouldAddProduct:String = ""
@@ -13,6 +14,14 @@ class MockUserInput extends UserInput {
   def getNewProductQuantity:String = newProductQuantity
 }
 
+class MockUserOutput extends UserOutput {
+  var displayed:ArrayList[String] = new ArrayList()
+
+  def display(text:String, newLine:Boolean) = {
+    displayed.add(text)
+  }
+}
+
 class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
 
   val productsFilePath = "src/test/resources/products.json"
@@ -20,7 +29,8 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
 
   var productManager:ProductManager = _
   var historyManager:HistoryManager = _
-  var userInput = new MockUserInput()
+  var userInput:MockUserInput = _
+  var userOutput:MockUserOutput = _
   var productWorkflow:ProductWorkflow = _
 
   before {
@@ -54,19 +64,26 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
     bw.close()
     historyManager = new HistoryManager(historyFilePath)
 
+    userInput = new MockUserInput()
+    userOutput = new MockUserOutput()
+
     // Instantiate our class under test
     productWorkflow = new ProductWorkflow(
       productManager,
       historyManager,
       userInput,
-      false
+      userOutput 
     )
   }
 
   describe("#run") {
-    it(""){
-      //productWorkflow.run(stdin.getLines)
+
+    describe("when the product was found") {
+      it(""){
+      }
     }
+
   }
+
 }
 
