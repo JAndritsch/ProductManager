@@ -131,6 +131,18 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
         assert((entry1 \ "found").values === false)
       }
 
+      it("asks the user if they would like to add the product") {
+        // setup
+        val enteredProducts = Iterator("product3")
+        userInput.shouldAddProduct = "No"
+
+        // act
+        productWorkflow.run(enteredProducts)
+
+        // assert
+        assert(userOutput.entries.contains("That product was not found. Would you like to add it: "))
+      }
+
       describe("and the user does not want to add the product") {
         it("does not ask the user to enter in any data for the product") {
           // setup
@@ -178,7 +190,7 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
         it("adds the product to the list") {
           // setup
           val enteredProducts = Iterator("product3")
-          userInput.shouldAddProduct = "Yes"
+          userInput.shouldAddProduct = "Y"
           userInput.newProductPrice = "14.99"
           userInput.newProductQuantity = "27"
 
@@ -192,7 +204,7 @@ class ProductWorkflowSpec extends FunSpec with BeforeAndAfter {
         it("notifies the user that the product has been added") {
           // setup
           val enteredProducts = Iterator("product3")
-          userInput.shouldAddProduct = "Yes"
+          userInput.shouldAddProduct = "y"
           userInput.newProductPrice = "14.99"
           userInput.newProductQuantity = "27"
 
